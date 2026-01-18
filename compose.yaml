@@ -1,0 +1,7 @@
+services:
+  agent:
+    build: .
+    ports:
+      - "9009:9009"
+    env_file:
+      - .env

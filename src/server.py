@@ -24,16 +24,16 @@ def main():
     # See: https://a2a-protocol.org/latest/tutorials/python/3-agent-skills-and-card/
     
     skill = AgentSkill(
-        id="",
-        name="",
-        description="",
-        tags=[],
-        examples=[]
+        id="chat",
+        name="Chat",
+        description="Answer questions and have conversations.",
+        tags=['chat', 'conversation', 'questions'],
+        examples=['hi, tell me about AI.']
     )
 
     agent_card = AgentCard(
-        name="",
-        description="",
+        name="Simple Agent",
+        description="A Conversational Agent that uses Gemini-3 to answer questions.",
         url=args.card_url or f"http://{args.host}:{args.port}/",
         version='1.0.0',
         default_input_modes=['text'],
