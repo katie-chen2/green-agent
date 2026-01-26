@@ -24,16 +24,16 @@ def main():
     # See: https://a2a-protocol.org/latest/tutorials/python/3-agent-skills-and-card/
     
     skill = AgentSkill(
-        id="chat",
-        name="Chat",
-        description="Answer questions and have conversations.",
-        tags=['chat', 'conversation', 'questions'],
-        examples=['hi, tell me about AI.']
+        id="memory_context_monitor",
+        name="Memory Context Monitor",
+        description="The green agent monitors and dynamically updates the memory context. It manages purple agent requests and attributes memory context by percentage to each purple agent. The green agent declares the game won when it reaches >= 80% attribution to a single purple agent.",
+        tags=['memory', 'context', 'monitoring', 'attribution'],
+        examples=["Monitor and update memory context based on purple agent requests."]
     )
 
     agent_card = AgentCard(
-        name="Simple Agent",
-        description="A Conversational Agent that uses Gemini-3 to answer questions.",
+        name="Memory Context Monitor Agent",
+        description="The green agent monitors and dynamically updates the memory context. It manages purple agent requests and attributes memory context by percentage to each purple agent. The green agent declares the game won when it reaches >= 80% attribution to a single purple agent.",
         url=args.card_url or f"http://{args.host}:{args.port}/",
         version='1.0.0',
         default_input_modes=['text'],
