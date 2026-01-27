@@ -145,7 +145,7 @@ class Agent:
         return attributions, game_won, raw_text
 
 
-    async def run(self, message: Message, updater: TaskUpdater) -> None:
+    async def run(self, message: Message, updater: TaskUpdater) :
         """
         The green agent is a monitor agent that evaluates the context to 
          determine which logic block comes from which purple agent.
@@ -182,3 +182,4 @@ class Agent:
         attributions, game_won, raw_eval = await self._evaluate_memory_attributions(by_sender)
         if attributions is not None:
             print(f"Game won: {game_won}")
+        return attributions
