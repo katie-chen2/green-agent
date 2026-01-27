@@ -182,4 +182,12 @@ class Agent:
         attributions, game_won, raw_eval = await self._evaluate_memory_attributions(by_sender)
         if attributions is not None:
             print(f"Game won: {game_won}")
-        return attributions
+        artifacts = [{
+            "game_won": game_won,
+            "attributions": attributions,
+            "raw_evaluation": raw_eval,
+        }]
+        return {
+            "status": "completed",
+            "artifacts": artifacts,
+        }
