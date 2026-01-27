@@ -6,13 +6,13 @@ from google.genai import types as genai_types
 from a2a.server.tasks import TaskUpdater
 from a2a.types import Message, TaskState, Part, TextPart
 from a2a.utils import get_message_text, new_agent_text_message
-
+import asyncio
 from messenger import Messenger
 
 
 class Agent:
     def __init__(self):
-        # self.messenger = Messenger()
+        self.messenger = Messenger()
         # Initialize other state here
         load_dotenv()
         self.messages = []
@@ -27,7 +27,14 @@ class Agent:
             "Provide accurate, reliable attributions based on the context.",
         )
 
-    def _handle_incoming(self, message: Message):
+    async def _poll_contenders(self, urls: list[str], message: str) -> list[Message]:
+        """Poll contender agents and return their messages."""
+        responses = await asyncio.gather(*[
+            self.messenger.talk_to_agent(message, url) for url in urls
+        ])
+        return responses
+
+    async def _handle_incoming(self, message: Message):
         """Build sender-prefixed combined text and accumulate per-sender history."""
         ordered_concat_parts: list[str] = []
 
@@ -149,8 +156,21 @@ class Agent:
 
         Use self.messenger.talk_to_agent(message, url) to call other agents.
         """
-        # Build combined message and store grouped dict in metadata
-        extracted = self._handle_incoming(message)
+        # Check if message has a sender in metadata
+        sender = (message.metadata or {}).get("sender") if message.metadata else None
+        
+        if not sender:
+            # No sender - poll other agents with this message
+            text = get_message_text(message)
+            agent_urls = ['http://localhost:8008']  # Configure these URLs as needed
+            print(f"> Polling agents for message without sender: {text}")
+            responses = await self._poll_contenders(agent_urls, text)
+            print(f"> Received {len(responses)} responses from agents")
+            # TODO: Process responses as needed
+            return
+        
+        # Has sender - proceed with memory management and attribution
+        extracted = await self._handle_incoming(message)
         combined = extracted["combined"]
         by_sender = extracted["grouped_by_sender"]
 
