@@ -166,7 +166,7 @@ class Agent:
             print(f"> Polling agents for message without sender: {text}")
             responses = await self._poll_contenders(agent_urls, text)
             print(f"> Received {len(responses)} responses from agents")
-            # TODO: Process responses as needed
+            # Intentionally do not add to memory or emit attribution
             return
         
         # Has sender - proceed with memory management and attribution
@@ -182,12 +182,15 @@ class Agent:
         attributions, game_won, raw_eval = await self._evaluate_memory_attributions(by_sender)
         if attributions is not None:
             print(f"Game won: {game_won}")
-        artifacts = [{
-            "game_won": game_won,
-            "attributions": attributions,
-            "raw_evaluation": raw_eval,
-        }]
-        return {
-            "status": "completed",
-            "artifacts": artifacts,
-        }
+            # Emit a status update with an agent message containing the attribution summary
+            summary_text = json.dumps({
+                "game_won": game_won,
+                "attributions": attributions,
+            })
+            summary_msg = updater.new_agent_message(parts=[Part(TextPart(text=summary_text))])
+            await updater.update_status(TaskState.working, message=summary_msg)
+            # Optionally emit raw evaluation details for inspection
+            if raw_eval:
+                eval_msg = updater.new_agent_message(parts=[Part(TextPart(text=f"[EVALUATION]\n{raw_eval}"))])
+                await updater.update_status(TaskState.working, message=eval_msg)
+        # No explicit return; results are communicated via TaskUpdater events
