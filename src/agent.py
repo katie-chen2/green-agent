@@ -1,4 +1,5 @@
 import json
+import os
 from wsgiref import types
 from dotenv import load_dotenv
 from google import genai
@@ -162,7 +163,9 @@ class Agent:
         if not sender:
             # No sender - poll other agents with this message
             text = get_message_text(message)
-            agent_urls = ['http://localhost:8008']  # Configure these URLs as needed
+            # Load agent URLs from environment variable
+            participant_urls = os.getenv('PARTICIPANT_URLS', 'http://0.0.0.0:8008')
+            agent_urls = [url.strip() for url in participant_urls.split(',')]
             print(f"> Polling agents for message without sender: {text}")
             responses = await self._poll_contenders(agent_urls, text)
             print(f"> Received {len(responses)} responses from agents")
